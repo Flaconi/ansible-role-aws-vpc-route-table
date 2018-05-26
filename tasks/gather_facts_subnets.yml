@@ -1,0 +1,66 @@
+---
+
+###
+### Loop over subnets
+###
+
+# Subnets by name
+#
+# Returns:
+# * aws_vpc_rt_subnet_by_name
+- include_tasks: _facts_subnet_by_name.yml
+  loop_control:
+    loop_var: subnet
+  with_items:
+    - "{{ rt.subnets }}"
+  when:
+    - subnet.name is defined
+
+# Subnets by cidr
+#
+# Returns:
+# * aws_vpc_rt_subnet_by_cidr
+- include_tasks: _facts_subnet_by_cidr.yml
+  loop_control:
+    loop_var: subnet
+  with_items:
+    - "{{ rt.subnets }}"
+  when:
+    - subnet.cidr is defined
+
+# Subnets by filter
+#
+# Returns:
+# * aws_vpc_rt_subnet_by_filter
+- include_tasks: _facts_subnet_by_filter.yml
+  loop_control:
+    loop_var: subnet
+  with_items:
+    - "{{ rt.subnets }}"
+  when:
+    - subnet.filter is defined
+
+# Subnets by id
+#
+# Returns:
+# * aws_vpc_rt_subnet_by_id
+- include_tasks: _facts_subnet_by_id.yml
+  loop_control:
+    loop_var: subnet
+  with_items:
+    - "{{ rt.subnets }}"
+  when:
+    - subnet.id is defined
+
+
+###
+### Merge subnets array and return: aws_vpc_route_table_subnets
+###
+- name: merge subnets array
+  set_fact:
+    aws_vpc_route_table_subnets: "{{ aws_vpc_route_table_subnets | default([]) + [item] }}"
+  with_items:
+    - "{{ aws_vpc_rt_subnet_by_name }}"
+    - "{{ aws_vpc_rt_subnet_by_cidr }}"
+    - "{{ aws_vpc_rt_subnet_by_filter }}"
+    - "{{ aws_vpc_rt_subnet_by_id }}"

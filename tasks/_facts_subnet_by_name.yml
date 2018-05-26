@@ -1,0 +1,13 @@
+---
+
+# Gather subnets by name
+#
+# * aws_vpc_route_tables loop variable: 'rt'
+# * aws_vpc_route_tables.subnets loop variable: 'subnet'
+#
+# Returns:
+# * aws_vpc_rt_subnet_by_name
+
+- name: gather subnets by name
+  set_fact:
+    aws_vpc_rt_subnet_by_name: "{{ aws_vpc_rt_subnet_by_name | default([]) + [subnet.name] }}"

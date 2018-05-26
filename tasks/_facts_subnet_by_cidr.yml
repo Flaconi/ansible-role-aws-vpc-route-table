@@ -1,0 +1,13 @@
+---
+
+# Gather subnets by cidr
+#
+# * aws_vpc_route_tables loop variable: 'rt'
+# * aws_vpc_route_tables.subnets loop variable: 'subnet'
+#
+# Returns:
+# * aws_vpc_rt_subnet_by_cidr
+
+- name: gather subnets by cidr
+  set_fact:
+    aws_vpc_rt_subnet_by_cidr: "{{ aws_vpc_rt_subnet_by_cidr | default([]) + [subnet.cidr] }}"

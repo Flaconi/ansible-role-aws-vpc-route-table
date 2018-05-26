@@ -1,0 +1,80 @@
+---
+
+###
+### Asserts
+###
+- name: ensure vpc_route_table array is defined correctly
+  assert:
+    that:
+      - rt.vpc_filter is defined
+    msg: "aws_vpc_route_tables[x].vpc_filter not defined, but required to lookup vpc"
+
+- name: ensure routes are defined correctly
+  assert:
+    that:
+      # dest must be present
+      - item.dest is defined
+      # type must be present
+      - item.type is defined
+      # type must be one of the following
+      - item.type in ['igw', 'nat', 'instance', 'interface', 'peering']
+      # igw does not require a 'filter' or 'name', the rest do
+      - (item.type in ['igw']) or (item.type in ['nat', 'instance', 'interface', 'peering'] and (item.filter is defined or item.name is defined))
+      # ensure only filter or name is defined, but never both
+      - not (item.name is defined and item.filter is defined)
+    msg: "aws_vpc_route_tables[x].routes[y] is not defined correctly"
+  with_items:
+    - "{{ rt.routes }}"
+
+- name: ensure subnets are defined correctly
+  assert:
+    that:
+      - item['name'] is defined or item['cidr'] is defined or item['id'] is defined or item['filter'] is defined
+    msg: "aws_vpc_route_tables[x].subnets[y] must have 'name', 'cidr', 'id' or 'filter'"
+  with_items:
+    - "{{ rt.subnets }}"
+
+
+###
+### Gather resources
+###
+
+# Returns:
+# * aws_vpc_route_table_vpc_id
+# * aws_vpc_route_table_vpc_cidr
+- include_tasks: gather_facts_vpc.yml
+
+# Returns
+# * aws_vpc_route_table_routes
+- include_tasks: gather_facts_routes.yml
+
+# Returns
+# * aws_vpc_route_table_subnets
+- include_tasks: gather_facts_subnets.yml
+
+
+###
+### Create routing table
+###
+
+# TODO: propagating_vgw_ids
+# https://docs.ansible.com/ansible/latest/modules/ec2_vpc_route_table_module.html
+
+- name: ensure route table is created
+  ec2_vpc_route_table:
+    # Fixed values
+    state: present
+    purge_routes: True
+    purge_subnets: True
+    purge_tags: True
+    # Looked-up values
+    vpc_id: "{{ aws_vpc_route_table_vpc_id }}"
+    routes: "{{ aws_vpc_route_table_routes }}"
+    subnets: "{{ aws_vpc_route_table_subnets }}"
+    # Optional values
+    tags: "{{ rt.tags | default({}) | get_attr('key', 'val') }}"
+    region: "{{ rt.region | default(aws_vpc_route_table_default_region | default(omit)) }}"
+    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit) }}"
+    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    profile: "{{ aws_vpc_route_table_profile | default(omit) }}"

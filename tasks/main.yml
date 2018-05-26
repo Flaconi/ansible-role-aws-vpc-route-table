@@ -1,0 +1,10 @@
+---
+
+###
+### Main entrypoint
+###
+- include_tasks: create_vpc_route_table.yml
+  loop_control:
+    loop_var: rt
+  with_items:
+    - "{{ aws_vpc_route_tables }}"
