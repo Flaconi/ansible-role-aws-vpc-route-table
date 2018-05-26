@@ -125,19 +125,61 @@
     - interface.filter is defined
 
 
+# VGW by Name tag
+#
+# Returns:
+# * aws_vpc_rt_vgw_by_name
+# * aws_vpc_rt_vgw_propagate_by_name
+- include_tasks: _facts_route_vgw_by_name.yml
+  loop_control:
+    loop_var: vgw
+  with_items:
+    - "{{ rt.routes }}"
+  when:
+    - vgw.type == 'vgw'
+    - vgw.name is defined
+
+# VGW by filter
+#
+# Returns:
+# * aws_vpc_rt_vgw_by_filter
+# * aws_vpc_rt_vgw_propagate_by_filter
+- include_tasks: _facts_route_vgw_by_filter.yml
+  loop_control:
+    loop_var: vgw
+  with_items:
+    - "{{ rt.routes }}"
+  when:
+    - vgw.type == 'vgw'
+    - vgw.filter is defined
+
+
 ###
-### Merge route array and return: aws_vpc_route_table_routes
+### Merge route/propagate arrays
+### Returns
+### * aws_vpc_route_table_routes
+### * aws_vpc_route_table_propagates
 ###
-- name: merge route array
+
+- name: merge route tables array
   set_fact:
     aws_vpc_route_table_routes: "{{ aws_vpc_route_table_routes | default([]) + [item] }}"
   with_items:
-    - "{{ aws_vpc_rt_igw }}"
-    - "{{ aws_vpc_rt_nat_by_name }}"
-    - "{{ aws_vpc_rt_nat_by_filter }}"
-    - "{{ aws_vpc_rt_peering_by_name }}"
-    - "{{ aws_vpc_rt_peering_by_filter }}"
-    - "{{ aws_vpc_rt_instance_by_name }}"
-    - "{{ aws_vpc_rt_instance_by_filter }}"
-    - "{{ aws_vpc_rt_interface_by_name }}"
-    - "{{ aws_vpc_rt_interface_by_filter }}"
+    - "{{ aws_vpc_rt_igw | default([]) }}"
+    - "{{ aws_vpc_rt_nat_by_name | default([]) }}"
+    - "{{ aws_vpc_rt_nat_by_filter | default([]) }}"
+    - "{{ aws_vpc_rt_vgw_by_name | default([]) }}"
+    - "{{ aws_vpc_rt_vgw_by_filter | default([]) }}"
+    - "{{ aws_vpc_rt_peering_by_name | default([]) }}"
+    - "{{ aws_vpc_rt_peering_by_filter | default([]) }}"
+    - "{{ aws_vpc_rt_instance_by_name | default([]) }}"
+    - "{{ aws_vpc_rt_instance_by_filter | default([]) }}"
+    - "{{ aws_vpc_rt_interface_by_name | default([]) }}"
+    - "{{ aws_vpc_rt_interface_by_filter | default([]) }}"
+
+- name: merge route propagate array
+  set_fact:
+    aws_vpc_route_table_propagates: "{{ aws_vpc_route_table_propagates | default([]) + [item] }}"
+  with_items:
+    - "{{ aws_vpc_rt_vgw_propagate_by_name | default([]) }}"
+    - "{{ aws_vpc_rt_vgw_propagate_by_filter | default([]) }}"

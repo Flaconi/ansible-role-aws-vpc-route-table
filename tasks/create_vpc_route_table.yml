@@ -17,11 +17,13 @@
       # type must be present
       - item.type is defined
       # type must be one of the following
-      - item.type in ['igw', 'nat', 'instance', 'interface', 'peering']
+      - item.type in ['igw', 'nat', 'vgw', 'instance', 'interface', 'peering']
       # igw does not require a 'filter' or 'name', the rest do
-      - (item.type in ['igw']) or (item.type in ['nat', 'instance', 'interface', 'peering'] and (item.filter is defined or item.name is defined))
+      - (item.type in ['igw']) or (item.type in ['nat', 'vgw', 'instance', 'interface', 'peering'] and (item.filter is defined or item.name is defined))
       # ensure only filter or name is defined, but never both
       - not (item.name is defined and item.filter is defined)
+      # ensure that vgw defines 'propagate'
+      - item.type in ['igw', 'nat', 'instance', 'interface', 'peering'] or (item.type in ['vgw'] and item.propagate is defined)
     msg: "aws_vpc_route_tables[x].routes[y] is not defined correctly"
   with_items:
     - "{{ rt.routes }}"
@@ -46,6 +48,7 @@
 
 # Returns
 # * aws_vpc_route_table_routes
+# * aws_vpc_route_table_propagates
 - include_tasks: gather_facts_routes.yml
 
 # Returns
@@ -57,9 +60,6 @@
 ### Create routing table
 ###
 
-# TODO: propagating_vgw_ids
-# https://docs.ansible.com/ansible/latest/modules/ec2_vpc_route_table_module.html
-
 - name: ensure route table is created
   ec2_vpc_route_table:
     # Fixed values
@@ -69,8 +69,9 @@
     purge_tags: True
     # Looked-up values
     vpc_id: "{{ aws_vpc_route_table_vpc_id }}"
-    routes: "{{ aws_vpc_route_table_routes }}"
-    subnets: "{{ aws_vpc_route_table_subnets }}"
+    routes: "{{ aws_vpc_route_table_routes | default(omit) }}"
+    subnets: "{{ aws_vpc_route_table_subnets | default(omit) }}"
+    propagating_vgw_ids: "{{ aws_vpc_route_table_propagates | default(omit) }}"
     # Optional values
     tags: "{{ rt.tags | default({}) | get_attr('key', 'val') }}"
     region: "{{ rt.region | default(aws_vpc_route_table_default_region | default(omit)) }}"

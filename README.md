@@ -83,6 +83,20 @@ aws_vpc_route_tables:
             val: my-peering-name
           - key: "tag:env"
             val: production
+      # Example for VGW by filter without route propagation
+      - dest: 185.28.100.14/32
+        type: vgw
+        propagation: False
+        name: my-vgw-name-1
+      # Example for VGW by filter with route propagation
+      - dest: 185.28.100.14/32
+        type: vgw
+        propagation: True
+        filter:
+          - key: "tag:Name"
+            val: my-vgw-name
+          - key: "tag:env"
+            val: production
     subnets:
       # Example for subnet by name
       - name: my-subnet-name
@@ -166,6 +180,20 @@ aws_vpc_route_tables:
         filter:
           - key: "tag:Name"
             val: my-peering-name
+          - key: "tag:env"
+            val: production
+      # Example for VGW by filter without route propagation
+      - dest: 185.28.100.14/32
+        type: vgw
+        propagation: False
+        name: my-vgw-name-1
+      # Example for VGW by filter with route propagation
+      - dest: 185.28.100.14/32
+        type: vgw
+        propagation: True
+        filter:
+          - key: "tag:Name"
+            val: my-vgw-name
           - key: "tag:env"
             val: production
     subnets:
