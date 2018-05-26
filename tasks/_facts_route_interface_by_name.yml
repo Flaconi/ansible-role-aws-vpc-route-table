@@ -29,4 +29,4 @@
 
 - name: set interface array
   set_fact:
-    aws_vpc_rt_interface_by_name: "{{ aws_vpc_rt_interface_by_name | default([]) + [{'dest': interface.dest, 'interface_id': _aws_vpc_rt_routes_interface.network_interfaces[0].network_interface_id }] }}"
+    aws_vpc_rt_interface_by_name: "{{ aws_vpc_rt_interface_by_name | default([]) + [{'dest': interface.dest, 'network_interface_id': _aws_vpc_rt_routes_interface.network_interfaces[0].network_interface_id }] }}"

@@ -28,4 +28,4 @@
 
 - name: set NAT gateway array
   set_fact:
-    aws_vpc_rt_nat_by_name: "{{ aws_vpc_rt_nat_by_name | default([]) + [{'dest': nat.dest, 'instance_id': _aws_vpc_rt_routes_nat.result[0].nat_gateway_id }] }}"
+    aws_vpc_rt_nat_by_name: "{{ aws_vpc_rt_nat_by_name | default([]) + [{'dest': nat.dest, 'gateway_id': _aws_vpc_rt_routes_nat.result[0].nat_gateway_id }] }}"
