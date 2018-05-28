@@ -7,6 +7,7 @@
   assert:
     that:
       - rt.vpc_filter is defined or rt.vpc_name is defined
+      - not (rt.vpc_filter is defined and rt.vpc_name is defined)
     msg: "aws_vpc_route_tables[x].vpc_filter or .vpc_name is not defined, but required to lookup vpc"
 
 - name: ensure routes are defined correctly
