@@ -6,8 +6,8 @@
 - name: ensure vpc_route_table array is defined correctly
   assert:
     that:
-      - rt.vpc_filter is defined
-    msg: "aws_vpc_route_tables[x].vpc_filter not defined, but required to lookup vpc"
+      - rt.vpc_filter is defined or rt.vpc_name is defined
+    msg: "aws_vpc_route_tables[x].vpc_filter or .vpc_name is not defined, but required to lookup vpc"
 
 - name: ensure routes are defined correctly
   assert:
@@ -44,7 +44,16 @@
 # Returns:
 # * aws_vpc_route_table_vpc_id
 # * aws_vpc_route_table_vpc_cidr
-- include_tasks: gather_facts_vpc.yml
+- include_tasks: gather_facts_vpc_by_filter.yml
+  when:
+    - rt.vpc_filter is defined
+
+# Returns:
+# * aws_vpc_route_table_vpc_id
+# * aws_vpc_route_table_vpc_cidr
+- include_tasks: gather_facts_vpc_by_name.yml
+  when:
+    - rt.vpc_name is defined
 
 # Returns
 # * aws_vpc_route_table_routes

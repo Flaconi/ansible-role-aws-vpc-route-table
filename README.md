@@ -13,9 +13,10 @@ This role handles the creation of Route tables for a VPC in AWS.
 
 Additional variables that can be used (either as `host_vars`/`group_vars` or via command line args):
 
-| Variable                      | Description                  |
-|-------------------------------|------------------------------|
-| `aws_vpc_route_table_profile` | Boto profile name to be used |
+| Variable                             | Description                  |
+|--------------------------------------|------------------------------|
+| `aws_vpc_route_table_profile`        | Boto profile name to be used |
+| `aws_vpc_route_table_default_region` | Default region to use        |
 
 
 ## Example definition
@@ -24,6 +25,14 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 
 ```yml
 aws_vpc_route_tables:
+  # Create route tables for a VPC by VPC name
+  - vpc_name: devops-test
+    routes:
+      - dest: 0.0.0.0/0
+        type: igw
+    subnets:
+      - name: my-subnet-name
+  # Create route tables for a VPC by VPC filter
   - vpc_filter:
       - key: "tag:Name"
         val: "devops-test-vpc"
@@ -115,6 +124,22 @@ aws_vpc_route_tables:
 #### All available parameter
 ```yml
 aws_vpc_route_tables:
+  # Create route tables for a VPC by VPC name
+  - vpc_name: devops-test
+    region: eu-central-1
+    tags:
+      - key: Name
+        val: devops-test-route-table
+      - key: env
+        val: production
+      - key: department
+        val: devops
+    routes:
+      - dest: 0.0.0.0/0
+        type: igw
+    subnets:
+      - name: my-subnet-name
+  # Create route tables for a VPC by VPC filter
   - vpc_filter:
       - key: "tag:Name"
         val: "devops-test-vpc"
