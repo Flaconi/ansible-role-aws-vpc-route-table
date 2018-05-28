@@ -33,6 +33,6 @@
 
 - name: set VGW propagate gateway array
   set_fact:
-    aws_vpc_rt_vgw_propagate_by_filter:  "{{ aws_vpc_rt_vgw_propagate_by_filter | default([]) + [_aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id] }}"
+    aws_vpc_rt_vgw_propagate_by_filter: "{{ aws_vpc_rt_vgw_propagate_by_filter | default([]) + [_aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id] }}"
   when:
     - vgw.propagate == True

@@ -3,6 +3,8 @@
 This role handles the creation of Route tables for a VPC in AWS.
 
 [![Build Status](https://travis-ci.org/Flaconi/ansible-role-aws-vpc-route-table.svg?branch=master)](https://travis-ci.org/Flaconi/ansible-role-aws-vpc-route-table)
+[![Version](https://img.shields.io/github/tag/Flaconi/ansible-role-aws-vpc-route-table.svg)](https://github.com/Flaconi/ansible-role-aws-vpc-route-table/tags)
+[![Ansible Galaxy](https://img.shields.io/ansible/role/d/25922.svg)](https://galaxy.ansible.com/Flaconi/aws-vpc-route-table/)
 
 ## Requirements
 
