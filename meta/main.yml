@@ -1,0 +1,20 @@
+---
+dependencies: []
+
+galaxy_info:
+  company: Flaconi GmbH
+  author: Patrick Plocke
+  license: Apache 2.0
+  description: Creates an arbitrary number of route tables for a VPC on AWS
+  min_ansible_version: 2.5
+  platforms:
+    - name: all
+      versions:
+        - all
+  galaxy_tags:
+    - AWS
+    - aws
+    - amazon
+    - cloud
+    - VPC
+    - route table
