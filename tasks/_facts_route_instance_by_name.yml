@@ -1,0 +1,31 @@
+---
+
+# Gather Instance by its Name tag:
+#
+# * aws_vpc_route_tables loop variable: 'rt'
+# * aws_vpc_route_tables.routes loop variable: 'instance'
+#
+# Returns:
+# * aws_vpc_rt_instance_by_name
+
+- name: gather instance by name
+  ec2_instance_facts:
+    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
+    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    profile: "{{ aws_vpc_route_table_profile | default(omit) }}"
+    region: "{{ rt.region | default(aws_vpc_route_table_default_region) }}"
+    filters:
+      "tag:Name": "{{ instance.name }}"
+  register: _aws_vpc_rt_routes_instance
+
+- name: fail if not exactly one instance was found by name
+  assert:
+    that:
+      - _aws_vpc_rt_routes_instance.instances is defined
+      - _aws_vpc_rt_routes_instance.instances | length == 1
+    msg: Not exactly one instance has been found
+
+- name: set instance array
+  set_fact:
+    aws_vpc_rt_instance_by_name: "{{ aws_vpc_rt_instance_by_name | default([]) + [{'dest': instance.dest, 'instance_id': _aws_vpc_rt_routes_instance.instances[0].instance_id }] }}"

@@ -1,0 +1,13 @@
+---
+
+# Gather IGW gateways
+#
+# * aws_vpc_route_tables loop variable: 'rt'
+# * aws_vpc_route_tables.routes loop variable: 'igw'
+#
+# Returns:
+# * aws_vpc_rt_igw
+
+- name: gather igw gateways
+  set_fact:
+    aws_vpc_rt_igw: "{{ aws_vpc_rt_igw | default([]) + [{'dest': igw.dest, 'gateway_id': 'igw'}] }}"

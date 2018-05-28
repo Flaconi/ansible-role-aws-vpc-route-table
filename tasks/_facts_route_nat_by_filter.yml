@@ -1,0 +1,30 @@
+---
+
+# Gather NAT gateways by filters:
+#
+# * aws_vpc_route_tables loop variable: 'rt'
+# * aws_vpc_route_tables.routes loop variable: 'nat'
+#
+# Returns:
+# * aws_vpc_rt_nat_by_filter
+
+- name: gather nat gateway by filter
+  ec2_vpc_nat_gateway_facts:
+    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
+    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    profile: "{{ aws_vpc_route_table_profile | default(omit) }}"
+    region: "{{ rt.region | default(aws_vpc_route_table_default_region) }}"
+    filters: "{{ nat.filter | get_attr('key', 'val') }}"
+  register: _aws_vpc_rt_routes_nat
+
+- name: fail if not exactly one NAT gateway was found by filter
+  assert:
+    that:
+      - _aws_vpc_rt_routes_nat.result is defined
+      - _aws_vpc_rt_routes_nat.result | length == 1
+    msg: Not exactly one NAT gateway has been found
+
+- name: set NAT gateway array
+  set_fact:
+    aws_vpc_rt_nat_by_filter: "{{ aws_vpc_rt_nat_by_filter | default([]) + [{'dest': nat.dest, 'gateway_id': _aws_vpc_rt_routes_nat.result[0].nat_gateway_id }] }}"

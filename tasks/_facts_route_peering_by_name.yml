@@ -1,0 +1,31 @@
+---
+
+# Gather Peering by its Name tag:
+#
+# * aws_vpc_route_tables loop variable: 'rt'
+# * aws_vpc_route_tables.routes loop variable: 'peering'
+#
+# Returns:
+# * aws_vpc_rt_peering_by_name
+
+- name: gather peering by name
+  ec2_vpc_peering_facts:
+    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
+    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    profile: "{{ aws_vpc_route_table_profile | default(omit) }}"
+    region: "{{ rt.region | default(aws_vpc_route_table_default_region) }}"
+    filters:
+      "tag:Name": "{{ peering.name }}"
+  register: _aws_vpc_rt_routes_peering
+
+- name: fail if not exactly one peering was found by name
+  assert:
+    that:
+      - _aws_vpc_rt_routes_peering.result is defined
+      - _aws_vpc_rt_routes_peering.result | length == 1
+    msg: Not exactly one peering has been found
+
+- name: set peering array
+  set_fact:
+    aws_vpc_rt_peering_by_name: "{{ aws_vpc_rt_peering_by_name | default([]) + [{'dest': peering.dest, 'vpc_peering_connection_id': _aws_vpc_rt_routes_peering.result[0].vpc_peering_connection_id }] }}"
