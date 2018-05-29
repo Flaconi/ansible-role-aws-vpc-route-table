@@ -27,4 +27,4 @@
 
 - name: set subnet array
   set_fact:
-    aws_vpc_rt_subnet_by_filter: "{{ aws_vpc_rt_subnet_by_filter | default([]) + [_aws_vpc_rt_subnets_filter.subnets[0].id] }}"
+    aws_vpc_rt_subnet_by_filter: "{{ aws_vpc_rt_subnet_by_filter + [_aws_vpc_rt_subnets_filter.subnets[0].id] }}"

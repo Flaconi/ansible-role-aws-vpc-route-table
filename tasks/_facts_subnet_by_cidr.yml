@@ -10,4 +10,4 @@
 
 - name: gather subnets by cidr
   set_fact:
-    aws_vpc_rt_subnet_by_cidr: "{{ aws_vpc_rt_subnet_by_cidr | default([]) + [subnet.cidr] }}"
+    aws_vpc_rt_subnet_by_cidr: "{{ aws_vpc_rt_subnet_by_cidr + [subnet.cidr] }}"

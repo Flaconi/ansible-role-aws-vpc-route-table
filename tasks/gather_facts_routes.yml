@@ -1,6 +1,27 @@
 ---
 
 ###
+### Make all route variables empty for this round
+###
+- name: empty all route variables to start fresh during this round
+  set_fact:
+    aws_vpc_rt_igw: []
+    aws_vpc_rt_nat_by_name: []
+    aws_vpc_rt_nat_by_filter: []
+    aws_vpc_rt_peering_by_name: []
+    aws_vpc_rt_peering_by_filter: []
+    aws_vpc_rt_instance_by_name: []
+    aws_vpc_rt_instance_by_filter: []
+    aws_vpc_rt_interface_by_name: []
+    aws_vpc_rt_interface_by_filter: []
+    aws_vpc_rt_vgw_by_name: []
+    aws_vpc_rt_vgw_propagate_by_name: []
+    aws_vpc_rt_vgw_by_filter: []
+    aws_vpc_rt_vgw_propagate_by_filter: []
+    aws_vpc_route_table_routes: []
+    aws_vpc_route_table_propagates: []
+
+###
 ### Loop over routes
 ###
 
@@ -163,23 +184,23 @@
 
 - name: merge route tables array
   set_fact:
-    aws_vpc_route_table_routes: "{{ aws_vpc_route_table_routes | default([]) + [item] }}"
+    aws_vpc_route_table_routes: "{{ aws_vpc_route_table_routes + [item] }}"
   with_items:
-    - "{{ aws_vpc_rt_igw | default([]) }}"
-    - "{{ aws_vpc_rt_nat_by_name | default([]) }}"
-    - "{{ aws_vpc_rt_nat_by_filter | default([]) }}"
-    - "{{ aws_vpc_rt_vgw_by_name | default([]) }}"
-    - "{{ aws_vpc_rt_vgw_by_filter | default([]) }}"
-    - "{{ aws_vpc_rt_peering_by_name | default([]) }}"
-    - "{{ aws_vpc_rt_peering_by_filter | default([]) }}"
-    - "{{ aws_vpc_rt_instance_by_name | default([]) }}"
-    - "{{ aws_vpc_rt_instance_by_filter | default([]) }}"
-    - "{{ aws_vpc_rt_interface_by_name | default([]) }}"
-    - "{{ aws_vpc_rt_interface_by_filter | default([]) }}"
+    - "{{ aws_vpc_rt_igw }}"
+    - "{{ aws_vpc_rt_nat_by_name }}"
+    - "{{ aws_vpc_rt_nat_by_filter }}"
+    - "{{ aws_vpc_rt_vgw_by_name }}"
+    - "{{ aws_vpc_rt_vgw_by_filter }}"
+    - "{{ aws_vpc_rt_peering_by_name }}"
+    - "{{ aws_vpc_rt_peering_by_filter }}"
+    - "{{ aws_vpc_rt_instance_by_name }}"
+    - "{{ aws_vpc_rt_instance_by_filter }}"
+    - "{{ aws_vpc_rt_interface_by_name }}"
+    - "{{ aws_vpc_rt_interface_by_filter }}"
 
 - name: merge route propagate array
   set_fact:
-    aws_vpc_route_table_propagates: "{{ aws_vpc_route_table_propagates | default([]) + [item] }}"
+    aws_vpc_route_table_propagates: "{{ aws_vpc_route_table_propagates + [item] }}"
   with_items:
-    - "{{ aws_vpc_rt_vgw_propagate_by_name | default([]) }}"
-    - "{{ aws_vpc_rt_vgw_propagate_by_filter | default([]) }}"
+    - "{{ aws_vpc_rt_vgw_propagate_by_name }}"
+    - "{{ aws_vpc_rt_vgw_propagate_by_filter }}"

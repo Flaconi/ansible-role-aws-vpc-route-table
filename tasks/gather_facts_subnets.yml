@@ -1,6 +1,17 @@
 ---
 
 ###
+### Make all subnet variables empty for this round
+###
+- name: empty all subnet variables to start fresh during this round
+  set_fact:
+    aws_vpc_rt_subnet_by_name: []
+    aws_vpc_rt_subnet_by_cidr: []
+    aws_vpc_rt_subnet_by_filter: []
+    aws_vpc_rt_subnet_by_id: []
+    aws_vpc_route_table_subnets: []
+
+###
 ### Loop over subnets
 ###
 
@@ -58,9 +69,9 @@
 ###
 - name: merge subnets array
   set_fact:
-    aws_vpc_route_table_subnets: "{{ aws_vpc_route_table_subnets | default([]) + [item] }}"
+    aws_vpc_route_table_subnets: "{{ aws_vpc_route_table_subnets + [item] }}"
   with_items:
-    - "{{ aws_vpc_rt_subnet_by_name | default([]) }}"
-    - "{{ aws_vpc_rt_subnet_by_cidr | default([]) }}"
-    - "{{ aws_vpc_rt_subnet_by_filter | default([]) }}"
-    - "{{ aws_vpc_rt_subnet_by_id | default([]) }}"
+    - "{{ aws_vpc_rt_subnet_by_name }}"
+    - "{{ aws_vpc_rt_subnet_by_cidr }}"
+    - "{{ aws_vpc_rt_subnet_by_filter }}"
+    - "{{ aws_vpc_rt_subnet_by_id }}"

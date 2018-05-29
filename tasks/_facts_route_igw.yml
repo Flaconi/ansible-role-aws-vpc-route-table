@@ -10,4 +10,4 @@
 
 - name: gather igw gateways
   set_fact:
-    aws_vpc_rt_igw: "{{ aws_vpc_rt_igw | default([]) + [{'dest': igw.dest, 'gateway_id': 'igw'}] }}"
+    aws_vpc_rt_igw: "{{ aws_vpc_rt_igw + [{'dest': igw.dest, 'gateway_id': 'igw'}] }}"

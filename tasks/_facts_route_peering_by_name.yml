@@ -28,4 +28,4 @@
 
 - name: set peering array
   set_fact:
-    aws_vpc_rt_peering_by_name: "{{ aws_vpc_rt_peering_by_name | default([]) + [{'dest': peering.dest, 'vpc_peering_connection_id': _aws_vpc_rt_routes_peering.result[0].vpc_peering_connection_id }] }}"
+    aws_vpc_rt_peering_by_name: "{{ aws_vpc_rt_peering_by_name + [{'dest': peering.dest, 'vpc_peering_connection_id': _aws_vpc_rt_routes_peering.result[0].vpc_peering_connection_id }] }}"
