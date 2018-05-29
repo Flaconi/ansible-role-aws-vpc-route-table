@@ -10,4 +10,4 @@
 
 - name: gather subnets by id
   set_fact:
-    aws_vpc_rt_subnet_by_id: "{{ aws_vpc_rt_subnet_by_id | default([]) + [subnet.id] }}"
+    aws_vpc_rt_subnet_by_id: "{{ aws_vpc_rt_subnet_by_id + [subnet.id] }}"

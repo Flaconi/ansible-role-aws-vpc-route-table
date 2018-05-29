@@ -30,10 +30,10 @@
 
 - name: set VGW gateway array
   set_fact:
-    aws_vpc_rt_vgw_by_name: "{{ aws_vpc_rt_vgw_by_name | default([]) + [{'dest': vgw.dest, 'gateway_id': _aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id }] }}"
+    aws_vpc_rt_vgw_by_name: "{{ aws_vpc_rt_vgw_by_name + [{'dest': vgw.dest, 'gateway_id': _aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id }] }}"
 
 - name: set VGW propagate gateway array
   set_fact:
-    aws_vpc_rt_vgw_propagate_by_name: "{{ aws_vpc_rt_vgw_propagate_by_name | default([]) + [_aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id] }}"
+    aws_vpc_rt_vgw_propagate_by_name: "{{ aws_vpc_rt_vgw_propagate_by_name + [_aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id] }}"
   when:
     - vgw.propagate == True

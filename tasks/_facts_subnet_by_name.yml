@@ -28,4 +28,4 @@
 
 - name: set subnet array
   set_fact:
-    aws_vpc_rt_subnet_by_name: "{{ aws_vpc_rt_subnet_by_name | default([]) + [_aws_vpc_rt_subnets_name.subnets[0].id] }}"
+    aws_vpc_rt_subnet_by_name: "{{ aws_vpc_rt_subnet_by_name + [_aws_vpc_rt_subnets_name.subnets[0].id] }}"
