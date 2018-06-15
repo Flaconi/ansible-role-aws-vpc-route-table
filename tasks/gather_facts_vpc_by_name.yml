@@ -6,9 +6,9 @@
     aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
     security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ aws_vpc_route_table_profile | default(omit) }}"
-    region: "{{ rt.region | default(aws_vpc_route_table_default_region) }}"
+    region: "{{ vpc.region | default(aws_vpc_route_table_default_region) }}"
     filters:
-      "tag:Name": "{{ rt.vpc_name }}"
+      "tag:Name": "{{ vpc.vpc_name }}"
   register: _vpc_rt_vpc
 
 - name: fail if vpc was not found
