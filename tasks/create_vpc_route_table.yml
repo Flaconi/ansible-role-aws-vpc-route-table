@@ -20,19 +20,19 @@
       # type must be present
       - item.type is defined
       # type must be one of the following
-      - item.type in ['igw', 'nat', 'vgw', 'instance', 'interface', 'peering']
+      - item.type in ['igw', 'nat', 'vgw', 'instance', 'eni', 'peering']
       # igw does not require a 'filter' or 'name', the rest do
       - >-
         (item.type in ['igw']) or
         (
-          item.type in ['nat', 'vgw', 'instance', 'interface', 'peering'] and
+          item.type in ['nat', 'vgw', 'instance', 'eni', 'peering'] and
           (item.filter is defined or item.name is defined)
         )
       # ensure only filter or name is defined, but never both
       - not (item.name is defined and item.filter is defined)
       # ensure that vgw defines 'propagate'
       - >-
-        item.type in ['igw', 'nat', 'instance', 'interface', 'peering'] or
+        item.type in ['igw', 'nat', 'instance', 'eni', 'peering'] or
         (item.type in ['vgw'] and item.propagate is defined)
     msg: "aws_vpc_route_tables[x].routes[y] is not defined correctly"
   with_items:
