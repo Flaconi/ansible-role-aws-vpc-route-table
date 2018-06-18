@@ -12,8 +12,8 @@
     aws_vpc_rt_peering_by_filter: []
     aws_vpc_rt_instance_by_name: []
     aws_vpc_rt_instance_by_filter: []
-    aws_vpc_rt_interface_by_name: []
-    aws_vpc_rt_interface_by_filter: []
+    aws_vpc_rt_eni_by_name: []
+    aws_vpc_rt_eni_by_filter: []
     aws_vpc_rt_vgw_by_name: []
     aws_vpc_rt_vgw_propagate_by_name: []
     aws_vpc_rt_vgw_by_filter: []
@@ -119,31 +119,31 @@
     - instance.filter is defined
 
 
-# Interface by Name tag
+# Eni by Name tag
 #
 # Returns:
-# * aws_vpc_rt_interface_by_name
-- include_tasks: _facts_route_interface_by_name.yml
+# * aws_vpc_rt_eni_by_name
+- include_tasks: _facts_route_eni_by_name.yml
   loop_control:
-    loop_var: interface
+    loop_var: eni
   with_items:
     - "{{ rt.routes }}"
   when:
-    - interface.type == 'interface'
-    - interface.name is defined
+    - eni.type == 'eni'
+    - eni.name is defined
 
-# Interface by filter
+# Eni by filter
 #
 # Returns:
-# * aws_vpc_rt_interface_by_filter
-- include_tasks: _facts_route_interface_by_filter.yml
+# * aws_vpc_rt_eni_by_filter
+- include_tasks: _facts_route_eni_by_filter.yml
   loop_control:
-    loop_var: interface
+    loop_var: eni
   with_items:
     - "{{ rt.routes }}"
   when:
-    - interface.type == 'interface'
-    - interface.filter is defined
+    - eni.type == 'eni'
+    - eni.filter is defined
 
 
 # VGW by Name tag
@@ -195,8 +195,8 @@
     - "{{ aws_vpc_rt_peering_by_filter }}"
     - "{{ aws_vpc_rt_instance_by_name }}"
     - "{{ aws_vpc_rt_instance_by_filter }}"
-    - "{{ aws_vpc_rt_interface_by_name }}"
-    - "{{ aws_vpc_rt_interface_by_filter }}"
+    - "{{ aws_vpc_rt_eni_by_name }}"
+    - "{{ aws_vpc_rt_eni_by_filter }}"
 
 - name: merge route propagate array
   set_fact:

@@ -9,6 +9,16 @@
 # * aws_vpc_rt_vgw_by_name
 # * aws_vpc_rt_vgw_propagate_by_name
 
+- name: combine vgw filter
+  set_fact:
+    _aws_vpc_route_table_vgw_filter: |
+      {{
+        aws_vpc_route_table_vgw_filter_additional + [{
+          'key': 'tag:Name',
+          'val': vgw.name
+        }]
+      }}
+
 - name: gather vgw gateway by name
   ec2_vpc_vgw_facts:
     aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
@@ -16,8 +26,7 @@
     security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ aws_vpc_route_table_profile | default(omit) }}"
     region: "{{ rt.region | default(aws_vpc_route_table_default_region) }}"
-    filters:
-      "tag:Name": "{{ vgw.name }}"
+    filters: "{{ _aws_vpc_route_table_vgw_filter | get_attr('key', 'val') }}"
   register: _aws_vpc_rt_routes_vgw
   check_mode: False
 
@@ -30,10 +39,21 @@
 
 - name: set VGW gateway array
   set_fact:
-    aws_vpc_rt_vgw_by_name: "{{ aws_vpc_rt_vgw_by_name + [{'dest': vgw.dest, 'gateway_id': _aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id }] }}"
+    aws_vpc_rt_vgw_by_name: |
+      {{
+        aws_vpc_rt_vgw_by_name + [{
+          'dest': vgw.dest,
+          'gateway_id': _aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id
+        }]
+      }}
 
 - name: set VGW propagate gateway array
   set_fact:
-    aws_vpc_rt_vgw_propagate_by_name: "{{ aws_vpc_rt_vgw_propagate_by_name + [_aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id] }}"
+    aws_vpc_rt_vgw_propagate_by_name: |
+      {{
+        aws_vpc_rt_vgw_propagate_by_name + [
+          _aws_vpc_rt_routes_vgw.virtual_gateways[0].vpn_gateway_id
+        ]
+      }}
   when:
     - vgw.propagate == True

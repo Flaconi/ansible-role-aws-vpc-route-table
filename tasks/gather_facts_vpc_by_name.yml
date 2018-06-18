@@ -1,14 +1,23 @@
 ---
 
+- name: combine vpc filter
+  set_fact:
+    _aws_vpc_route_table_vpc_filter: |
+      {{
+        aws_vpc_route_table_vpc_filter_additional + [{
+          'key': 'tag:Name',
+          'val': vpc.vpc_name
+        }]
+      }}
+
 - name: gather vpc facts by name
   ec2_vpc_net_facts:
     aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
     aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
     security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ aws_vpc_route_table_profile | default(omit) }}"
-    region: "{{ rt.region | default(aws_vpc_route_table_default_region) }}"
-    filters:
-      "tag:Name": "{{ rt.vpc_name }}"
+    region: "{{ vpc.region | default(aws_vpc_route_table_default_region) }}"
+    filters: "{{ _aws_vpc_route_table_vpc_filter | get_attr('key', 'val') }}"
   register: _vpc_rt_vpc
 
 - name: fail if vpc was not found

@@ -3,12 +3,14 @@
 ###
 ### Asserts
 ###
-- name: ensure vpc_route_table array is defined correctly
+
+# Assert that required name element is present
+- name: ensure route_tables[x].routes contains name key
   assert:
     that:
-      - rt.vpc_filter is defined or rt.vpc_name is defined
-      - not (rt.vpc_filter is defined and rt.vpc_name is defined)
-    msg: "aws_vpc_route_tables[x].vpc_filter or .vpc_name is not defined, but required to lookup vpc"
+      - rt.name is defined
+      - rt.name | length > 0
+    msg: "aws_vpc_route_tables[x].route_tables[y].name not defined, but required"
 
 - name: ensure routes are defined correctly
   assert:
@@ -18,13 +20,20 @@
       # type must be present
       - item.type is defined
       # type must be one of the following
-      - item.type in ['igw', 'nat', 'vgw', 'instance', 'interface', 'peering']
+      - item.type in ['igw', 'nat', 'vgw', 'instance', 'eni', 'peering']
       # igw does not require a 'filter' or 'name', the rest do
-      - (item.type in ['igw']) or (item.type in ['nat', 'vgw', 'instance', 'interface', 'peering'] and (item.filter is defined or item.name is defined))
+      - >-
+        (item.type in ['igw']) or
+        (
+          item.type in ['nat', 'vgw', 'instance', 'eni', 'peering'] and
+          (item.filter is defined or item.name is defined)
+        )
       # ensure only filter or name is defined, but never both
       - not (item.name is defined and item.filter is defined)
       # ensure that vgw defines 'propagate'
-      - item.type in ['igw', 'nat', 'instance', 'interface', 'peering'] or (item.type in ['vgw'] and item.propagate is defined)
+      - >-
+        item.type in ['igw', 'nat', 'instance', 'eni', 'peering'] or
+        (item.type in ['vgw'] and item.propagate is defined)
     msg: "aws_vpc_route_tables[x].routes[y] is not defined correctly"
   with_items:
     - "{{ rt.routes }}"
@@ -70,6 +79,16 @@
 ### Create routing table
 ###
 
+- name: set route table tags
+  set_fact:
+    _aws_vpc_route_table_tags: |
+      {{
+        rt.tags | default([]) + [{
+          'key': 'Name',
+          'val': rt.name
+        }]
+      }}
+
 - name: ensure route table is created
   ec2_vpc_route_table:
     # Fixed values
@@ -83,7 +102,7 @@
     subnets: "{{ aws_vpc_route_table_subnets | default(omit) }}"
     propagating_vgw_ids: "{{ aws_vpc_route_table_propagates | default(omit) }}"
     # Optional values
-    tags: "{{ rt.tags | default({}) | get_attr('key', 'val') }}"
+    tags: "{{ _aws_vpc_route_table_tags | get_attr('key', 'val') }}"
     region: "{{ rt.region | default(aws_vpc_route_table_default_region | default(omit)) }}"
     aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
     aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit) }}"

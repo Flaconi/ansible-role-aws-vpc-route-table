@@ -15,10 +15,17 @@ This role handles the creation of Route tables for a VPC in AWS.
 
 Additional variables that can be used (either as `host_vars`/`group_vars` or via command line args):
 
-| Variable                             | Description                  |
-|--------------------------------------|------------------------------|
-| `aws_vpc_route_table_profile`        | Boto profile name to be used |
-| `aws_vpc_route_table_default_region` | Default region to use        |
+| Variable                                         | Description                  |
+|--------------------------------------------------|------------------------------|
+| `aws_vpc_route_table_profile`                    | Boto profile name to be used |
+| `aws_vpc_route_table_default_region`             | Default region to use        |
+| `aws_vpc_route_table_vpc_filter_additional`      | Additional `key` `val` filter to add to `vpc_filter` and `vpc_name` by default. |
+| `aws_vpc_route_table_instance_filter_additional` | Additional `key` `val` filter to add to `instance_filter` and `instance_name` by default. |
+| `aws_vpc_route_table_eni_filter_additional`      | Additional `key` `val` filter to add to `eni_filter` and `eni_name` by default. |
+| `aws_vpc_route_table_nat_filter_additional`      | Additional `key` `val` filter to add to `nat_filter` and `nat_name` by default. |
+| `aws_vpc_route_table_vgw_filter_additional`      | Additional `key` `val` filter to add to `vgw_filter` and `vgw_name` by default. |
+| `aws_vpc_route_table_subnet_filter_additional`   | Additional `key` `val` filter to add to `subnet_filter` and `subnet_name` by default. |
+| `aws_vpc_route_table_peering_filter_additional`  | Additional `key` `val` filter to add to `peering_filter` and `peering_name` by default. |
 
 
 ## Example definition
@@ -27,13 +34,17 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 
 ```yml
 aws_vpc_route_tables:
+
   # Create route tables for a VPC by VPC name
-  - vpc_name: devops-test
-    routes:
-      - dest: 0.0.0.0/0
-        type: igw
-    subnets:
-      - name: my-subnet-name
+  - vpc_name: devops-test-vpc
+    route_tables:
+      - name: my-route-table-1
+        routes:
+          - dest: 0.0.0.0/0
+            type: igw
+        subnets:
+          - name: my-subnet-name-1
+
   # Create route tables for a VPC by VPC filter
   - vpc_filter:
       - key: "tag:Name"
@@ -42,105 +53,138 @@ aws_vpc_route_tables:
         val: playground
       - key: "tag:department"
         val: devops
-    routes:
-      # Example for Internet gateway
-      - dest: 0.0.0.0/0
-        type: igw
-      # Example for NAT GW by name
-      - dest: 185.28.100.13/32
-        type: nat
-        name: my-nat-gw-name
-      # Example for NAT GW by filter
-      - dest: 185.28.100.13/32
-        type: nat
-        filter:
-          - key: "tag:Name"
-            val: my-nat-gw-name
-          - key: "tag:env"
-            val: production
-      # Example for Instance by name
-      - dest: 185.28.100.13/32
-        type: instance
-        name: my-instance-name
-      # Example for Instance by filter
-      - dest: 185.28.100.13/32
-        type: instance
-        filter:
-          - key: "tag:Name"
-            val: my-instance-name
-          - key: "tag:env"
-            val: production
-      # Example for Interface by name
-      - dest: 185.28.100.13/32
-        type: interface
-        name: my-interface-name
-      # Example for Interface by filter
-      - dest: 185.28.100.13/32
-        type: interface
-        filter:
-          - key: "tag:Name"
-            val: my-interface-name
-          - key: "tag:env"
-            val: production
-      # Example for VPC Peering by name
-      - dest: 185.28.100.13/32
-        type: peering
-        name: my-peering-name
-      # Example for VPC Peering by filter
-      - dest: 185.28.100.13/32
-        type: peering
-        filter:
-          - key: "tag:Name"
-            val: my-peering-name
-          - key: "tag:env"
-            val: production
-      # Example for VGW by filter without route propagation
-      - dest: 185.28.100.14/32
-        type: vgw
-        propagation: False
-        name: my-vgw-name-1
-      # Example for VGW by filter with route propagation
-      - dest: 185.28.100.14/32
-        type: vgw
-        propagation: True
-        filter:
-          - key: "tag:Name"
-            val: my-vgw-name
-          - key: "tag:env"
-            val: production
-    subnets:
-      # Example for subnet by name
-      - name: my-subnet-name
-      # Example for subnet by cidr
-      - cidr: 172.25.2.0/24
-      # Example for subnet by id
-      - id: subnet-0fead839
-      # Example for subnet by filter
-      - filter:
-          - key: "tag:Name"
-            val: my-subnet-name
-          - key: "tag:env"
-            val: production
+    route_tables:
+      - name: my-route-table-2
+        routes:
+          # Example for Internet gateway
+          - dest: 0.0.0.0/0
+            type: igw
+          # Example for NAT GW by name
+          - dest: 185.28.100.13/32
+            type: nat
+            name: my-nat-gw-name
+          # Example for NAT GW by filter
+          - dest: 185.28.100.13/32
+            type: nat
+            filter:
+              - key: "tag:Name"
+                val: my-nat-gw-name
+              - key: "tag:env"
+                val: production
+          # Example for Instance by name
+          - dest: 185.28.100.13/32
+            type: instance
+            name: my-instance-name
+          # Example for Instance by filter
+          - dest: 185.28.100.13/32
+            type: instance
+            filter:
+              - key: "tag:Name"
+                val: my-instance-name
+              - key: "tag:env"
+                val: production
+          # Example for ENI by name
+          - dest: 185.28.100.13/32
+            type: eni
+            name: my-eni-name
+          # Example for ENI by filter
+          - dest: 185.28.100.13/32
+            type: eni
+            filter:
+              - key: "tag:Name"
+                val: my-eni-name
+              - key: "tag:env"
+                val: production
+          # Example for VPC Peering by name
+          - dest: 185.28.100.13/32
+            type: peering
+            name: my-peering-name
+          # Example for VPC Peering by filter
+          - dest: 185.28.100.13/32
+            type: peering
+            filter:
+              - key: "tag:Name"
+                val: my-peering-name
+              - key: "tag:env"
+                val: production
+          # Example for VGW by filter without route propagation
+          - dest: 185.28.100.14/32
+            type: vgw
+            propagation: False
+            name: my-vgw-name-1
+          # Example for VGW by filter with route propagation
+          - dest: 185.28.100.14/32
+            type: vgw
+            propagation: True
+            filter:
+              - key: "tag:Name"
+                val: my-vgw-name
+              - key: "tag:env"
+                val: production
+        subnets:
+          # Example for subnet by name
+          - name: my-subnet-name
+          # Example for subnet by cidr
+          - cidr: 172.25.2.0/24
+          # Example for subnet by id
+          - id: subnet-0fead839
+          # Example for subnet by filter
+          - filter:
+              - key: "tag:Name"
+                val: my-subnet-name
+              - key: "tag:env"
+                val: production
 ```
 
 #### All available parameter
 ```yml
+# Only gather available resources
+aws_vpc_route_table_vpc_filter_additional:
+  - key: state
+    val: available
+
+aws_vpc_route_table_ec2_filter_additional:
+  - key: state
+    val: available
+
+aws_vpc_route_table_eni_filter_additional:
+  - key: state
+    val: available
+
+aws_vpc_route_table_nat_filter_additional:
+  - key: state
+    val: available
+
+aws_vpc_route_table_vgw_filter_additional:
+  - key: state
+    val: available
+
+aws_vpc_route_table_subnet_filter_additional:
+  - key: state
+    val: available
+
+aws_vpc_route_table_peering_filter_additional:
+  - key: status-code
+    val: active
+
 aws_vpc_route_tables:
+
   # Create route tables for a VPC by VPC name
-  - vpc_name: devops-test
+  - vpc_name: devops-test-vpc
     region: eu-central-1
-    tags:
-      - key: Name
-        val: devops-test-route-table
-      - key: env
-        val: production
-      - key: department
-        val: devops
-    routes:
-      - dest: 0.0.0.0/0
-        type: igw
-    subnets:
-      - name: my-subnet-name
+    route_tables:
+      - name: my-route-table-1
+        tags:
+          - key: env
+            val: production
+          - key: department
+            val: devops
+        routes:
+          - dest: 0.0.0.0/0
+            type: igw
+        subnets:
+          - name: my-subnet-name-1
+
   # Create route tables for a VPC by VPC filter
   - vpc_filter:
       - key: "tag:Name"
@@ -150,90 +194,111 @@ aws_vpc_route_tables:
       - key: "tag:department"
         val: devops
     region: eu-central-1
-    tags:
-      - key: Name
-        val: devops-test-route-table
-      - key: env
-        val: production
-      - key: department
-        val: devops
-    routes:
-      # Example for Internet gateway
-      - dest: 0.0.0.0/0
-        type: igw
-      # Example for NAT GW by name
-      - dest: 185.28.100.13/32
-        type: nat
-        name: my-nat-gw-name
-      # Example for NAT GW by filter
-      - dest: 185.28.100.13/32
-        type: nat
-        filter:
-          - key: "tag:Name"
-            val: my-nat-gw-name
-          - key: "tag:env"
+    route_tables:
+      - name: my-route-table-2
+        tags:
+          - key: env
             val: production
-      # Example for Instance by name
-      - dest: 185.28.100.13/32
-        type: instance
-        name: my-instance-name
-      # Example for Instance by filter
-      - dest: 185.28.100.13/32
-        type: instance
-        filter:
-          - key: "tag:Name"
-            val: my-instance-name
-          - key: "tag:env"
-            val: production
-      # Example for Interface by name
-      - dest: 185.28.100.13/32
-        type: interface
-        name: my-interface-name
-      # Example for Interface by filter
-      - dest: 185.28.100.13/32
-        type: interface
-        filter:
-          - key: "tag:Name"
-            val: my-interface-name
-          - key: "tag:env"
-            val: production
-      # Example for VPC Peering by name
-      - dest: 185.28.100.13/32
-        type: peering
-        name: my-peering-name
-      # Example for VPC Peering by filter
-      - dest: 185.28.100.13/32
-        type: peering
-        filter:
-          - key: "tag:Name"
-            val: my-peering-name
-          - key: "tag:env"
-            val: production
-      # Example for VGW by filter without route propagation
-      - dest: 185.28.100.14/32
-        type: vgw
-        propagation: False
-        name: my-vgw-name-1
-      # Example for VGW by filter with route propagation
-      - dest: 185.28.100.14/32
-        type: vgw
-        propagation: True
-        filter:
-          - key: "tag:Name"
-            val: my-vgw-name
-          - key: "tag:env"
-            val: production
-    subnets:
-      # Example for subnet by name
-      - name: my-subnet-name
-      # Example for subnet by cidr
-      - cidr: 172.25.2.0/24
-      # Example for subnet by id
-      - id: subnet-0fead839
-      # Example for subnet by filter
-      - filter:
-          - key: "tag:Name"
-            val: my-subnet-name
-          - key: "tag:env"
-            val: production
+          - key: department
+            val: devops
+        routes:
+          # Example for Internet gateway
+          - dest: 0.0.0.0/0
+            type: igw
+          # Example for NAT GW by name
+          - dest: 185.28.100.13/32
+            type: nat
+            name: my-nat-gw-name
+          # Example for NAT GW by filter
+          - dest: 185.28.100.13/32
+            type: nat
+            filter:
+              - key: "tag:Name"
+                val: my-nat-gw-name
+              - key: "tag:env"
+                val: production
+          # Example for Instance by name
+          - dest: 185.28.100.13/32
+            type: instance
+            name: my-instance-name
+          # Example for Instance by filter
+          - dest: 185.28.100.13/32
+            type: instance
+            filter:
+              - key: "tag:Name"
+                val: my-instance-name
+              - key: "tag:env"
+                val: production
+          # Example for ENI by name
+          - dest: 185.28.100.13/32
+            type: eni
+            name: my-eni-name
+          # Example for ENI by filter
+          - dest: 185.28.100.13/32
+            type: eni
+            filter:
+              - key: "tag:Name"
+                val: my-eni-name
+              - key: "tag:env"
+                val: production
+          # Example for VPC Peering by name
+          - dest: 185.28.100.13/32
+            type: peering
+            name: my-peering-name
+          # Example for VPC Peering by filter
+          - dest: 185.28.100.13/32
+            type: peering
+            filter:
+              - key: "tag:Name"
+                val: my-peering-name
+              - key: "tag:env"
+                val: production
+          # Example for VGW by filter without route propagation
+          - dest: 185.28.100.14/32
+            type: vgw
+            propagation: False
+            name: my-vgw-name-1
+          # Example for VGW by filter with route propagation
+          - dest: 185.28.100.14/32
+            type: vgw
+            propagation: True
+            filter:
+              - key: "tag:Name"
+                val: my-vgw-name
+              - key: "tag:env"
+                val: production
+        subnets:
+          # Example for subnet by name
+          - name: my-subnet-name
+          # Example for subnet by cidr
+          - cidr: 172.25.2.0/24
+          # Example for subnet by id
+          - id: subnet-0fead839
+          # Example for subnet by filter
+          - filter:
+              - key: "tag:Name"
+                val: my-subnet-name
+              - key: "tag:env"
+                val: production
+```
+
+
+## Testing
+
+#### Requirements
+
+* Docker
+* [yamllint](https://github.com/adrienverge/yamllint)
+
+#### Run tests
+
+```bash
+# Lint the source files
+make lint
+
+# Run integration tests with default Ansible version
+make test
+
+# Run integration tests with custom Ansible version
+make test ANSIBLE_VERSION=2.4
 ```

@@ -1,0 +1,35 @@
+---
+
+###
+### Asserts
+###
+- name: ensure vpc_route_table array is defined correctly
+  assert:
+    that:
+      - vpc.vpc_filter is defined or vpc.vpc_name is defined
+      - not (vpc.vpc_filter is defined and vpc.vpc_name is defined)
+    msg: "aws_vpc_route_tables[x].vpc_filter or .vpc_name is not defined, but required to lookup vpc"
+
+
+# Returns:
+# * aws_vpc_igw_vpc_id
+# * aws_vpc_igw_vpc_cidr
+- include_tasks: gather_facts_vpc_by_filter.yml
+  when:
+    - vpc.vpc_filter is defined
+
+
+# Returns:
+# * aws_vpc_igw_vpc_id
+# * aws_vpc_igw_vpc_cidr
+- include_tasks: gather_facts_vpc_by_name.yml
+  when:
+    - vpc.vpc_name is defined
+
+
+# Now loop over all route tables for the current VPC
+- include_tasks: create_vpc_route_table.yml
+  loop_control:
+    loop_var: rt
+  with_items:
+    - "{{ vpc.route_tables }}"
