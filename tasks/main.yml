@@ -8,3 +8,4 @@
     loop_var: vpc
   with_items:
     - "{{ aws_vpc_route_tables }}"
+  tags: aws_vpc_route_table
