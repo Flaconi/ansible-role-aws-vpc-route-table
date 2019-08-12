@@ -89,7 +89,7 @@
         }]
       }}
 
-- name: ensure route table is created
+- name: "ensure route table is created: {{ rt.name }}"
   ec2_vpc_route_table:
     # Fixed values
     state: present
