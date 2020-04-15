@@ -93,9 +93,9 @@
   ec2_vpc_route_table:
     # Fixed values
     state: present
-    purge_routes: True
-    purge_subnets: True
-    purge_tags: True
+    purge_routes: "{{ aws_vpc_route_table_purge_routes }}"
+    purge_subnets: "{{ aws_vpc_route_table_purge_subnets }}"
+    purge_tags: "{{ aws_vpc_route_table_purge_tags }}"
     # Looked-up values
     vpc_id: "{{ aws_vpc_route_table_vpc_id }}"
     routes: "{{ aws_vpc_route_table_routes | default(omit) }}"

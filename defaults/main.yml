@@ -16,3 +16,7 @@ aws_vpc_route_table_peering_filter_additional: []
 aws_vpc_route_table_subnet_filter_additional: []
 
 aws_vpc_route_tables: []
+
+aws_vpc_route_table_purge_routes: True
+aws_vpc_route_table_purge_subnets: True
+aws_vpc_route_table_purge_tags: True
