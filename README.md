@@ -26,9 +26,9 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 | `aws_vpc_route_table_vgw_filter_additional`      | Additional `key` `val` filter to add to `vgw_filter` and `vgw_name` by default. |
 | `aws_vpc_route_table_subnet_filter_additional`   | Additional `key` `val` filter to add to `subnet_filter` and `subnet_name` by default. |
 | `aws_vpc_route_table_peering_filter_additional`  | Additional `key` `val` filter to add to `peering_filter` and `peering_name` by default. |
-| `aws_vpc_route_table_purge_routes`               | Boolean flag for toggling the [union][1] of routes as described locally (Ansible) vs. remote (AWS). |
-| `aws_vpc_route_table_purge_subnets`              | Boolean flag for toggling the [union][1] of subnets as described locally (Ansible) vs. remote (AWS). |
-| `aws_vpc_route_table_purge_tags`                 | Boolean flag for toggling the [union][1] of route table tags as described locally (Ansible) vs. remote (AWS). |
+| `aws_vpc_route_table_purge_routes`               | Boolean flag for toggling the [union][1] of routes as described locally (Ansible) vs. remote (AWS). `Default: True` |
+| `aws_vpc_route_table_purge_subnets`              | Boolean flag for toggling the [union][1] of subnets as described locally (Ansible) vs. remote (AWS). `Default: True` |
+| `aws_vpc_route_table_purge_tags`                 | Boolean flag for toggling the [union][1] of route table tags as described locally (Ansible) vs. remote (AWS). `Default: True` |
 
 __Important:__ the above three variables responsible for purging entries on AWS
 are scoped for the whole role invocation, even though the role supports taking
