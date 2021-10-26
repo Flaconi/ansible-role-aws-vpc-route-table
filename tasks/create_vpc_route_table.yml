@@ -104,7 +104,7 @@
     # Optional values
     tags: "{{ _aws_vpc_route_table_tags | get_attr('key', 'val') }}"
     region: "{{ rt.region | default(aws_vpc_route_table_default_region | default(omit)) }}"
-    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
-    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit) }}"
-    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') | default(omit) }}"
+    security_token: "{{ lookup('env', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ aws_vpc_route_table_profile | default(omit) }}"
