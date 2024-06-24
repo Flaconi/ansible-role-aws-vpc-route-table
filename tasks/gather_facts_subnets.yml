@@ -75,3 +75,5 @@
     - "{{ aws_vpc_rt_subnet_by_cidr }}"
     - "{{ aws_vpc_rt_subnet_by_filter }}"
     - "{{ aws_vpc_rt_subnet_by_id }}"
+  when: not ([item] in aws_vpc_route_table_subnets)
+ 
